@@ -62,15 +62,11 @@ AS_IF([test "x$found_introspection" = "xyes"],
 AS_IF([test "x$VAPIGEN" != "x"], [have_vapigen=yes])
 AM_CONDITIONAL([HAVE_VAPIGEN], [test "x$VAPIGEN" != "x"])
 
-GTK_DOC_CHECK([1.10],[--flavour no-tmpl])
-
 AC_CONFIG_FILES([
 Makefile
 libgupnp-av/Makefile
 tests/Makefile
 tests/gtest/Makefile
-doc/Makefile
-doc/version.xml
 data/Makefile
 vala/Makefile
 gupnp-av-1.0.pc
