@@ -13,6 +13,7 @@ BuildRequires: gssdp-devel >= 0.14.0
 BuildRequires: gupnp-devel >= 0.20.0
 BuildRequires: libxml2-devel
 BuildRequires: libsoup-devel
+BuildRequires: gobject-introspection-devel >= 1.36.0
 
 %description
 GUPnP is an object-oriented open source framework for creating UPnP
@@ -52,9 +53,11 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
 %files
 %{_libdir}/libgupnp-av-1.0.so.*
+%{_libdir}/girepository-1.0/GUPnPAV-1.0.typelib
 %{_datadir}/%{name}
 
 %files devel
 %{_includedir}/gupnp-av-1.0
 %{_libdir}/pkgconfig/gupnp-av-1.0.pc
 %{_libdir}/libgupnp-av-1.0.so
+%{_datadir}/gir-1.0/GUPnPAV-1.0.gir
