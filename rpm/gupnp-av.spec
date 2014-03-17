@@ -14,6 +14,8 @@ BuildRequires: gupnp-devel >= 0.20.0
 BuildRequires: libxml2-devel
 BuildRequires: libsoup-devel
 BuildRequires: gobject-introspection-devel >= 1.36.0
+BuildRequires: vala-devel
+BuildRequires: vala-tools
 
 %description
 GUPnP is an object-oriented open source framework for creating UPnP
@@ -61,3 +63,4 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 %{_libdir}/pkgconfig/gupnp-av-1.0.pc
 %{_libdir}/libgupnp-av-1.0.so
 %{_datadir}/gir-1.0/GUPnPAV-1.0.gir
+%{_datadir}/vala/vapi/*
