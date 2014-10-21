@@ -27,6 +27,23 @@
 
 #include "xml-util.h"
 
+typedef struct _GUPnPXMLNamespaceDescription
+{
+        char *uri;
+        char *prefix;
+} GUPnPXMLNamespaceDescription;
+
+
+static GUPnPXMLNamespaceDescription gupnp_xml_namespaces[] =
+{
+        { "urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/", NULL },
+        { "http://purl.org/dc/elements/1.1/", "dc" },
+        { "urn:schemas-dlna-org:metadata-1-0/", "dlna" },
+        { "http://www.pv.com/pvns/", "pv" },
+        { "urn:schemas-upnp-org:metadata-1-0/upnp/", "upnp" },
+        NULL
+};
+
 xmlNode *
 xml_util_get_element (xmlNode *node,
                       ...)
@@ -219,7 +236,8 @@ xml_util_get_int64_attribute (xmlNode    *node,
 
 xmlNode *
 xml_util_set_child (xmlNode    *parent_node,
-                    xmlNs      *namespace,
+                    GUPnPXMLNamespace ns,
+                    xmlNsPtr   *xmlns,
                     xmlDoc     *doc,
                     const char *name,
                     const char *value)
@@ -228,11 +246,15 @@ xml_util_set_child (xmlNode    *parent_node,
         xmlChar *escaped;
 
         node = xml_util_get_element (parent_node, name, NULL);
-        if (node == NULL)
+        if (node == NULL) {
+                xmlNsPtr ns_ptr = NULL;
+
+                ns_ptr = xml_util_get_ns (doc, ns, xmlns);
                 node = xmlNewChild (parent_node,
-                                    namespace,
+                                    ns_ptr,
                                     (unsigned char *) name,
                                     NULL);
+        }
 
         escaped = xmlEncodeSpecialChars (doc, (const unsigned char *) value);
         xmlNodeSetContent (node, escaped);
@@ -410,4 +432,101 @@ xml_util_get_attributes_map (xmlNode *node)
                                      (gpointer) attribute->children->content);
 
         return attributes_map;
+}
+
+/**
+ * xml_util_create_namespace:
+ * @root: (allow-none): Document root node or %NULL for anonymous ns.
+ * @ns: Namespace
+ * @returns: Newly created namespace on root node
+ */
+xmlNsPtr
+xml_util_create_namespace (xmlNodePtr root, GUPnPXMLNamespace ns)
+{
+        g_return_val_if_fail (ns < GUPNP_XML_NAMESPACE_COUNT, NULL);
+
+        return xmlNewNs (root,
+                         (const xmlChar *) gupnp_xml_namespaces[ns].uri,
+                         (const xmlChar *) gupnp_xml_namespaces[ns].prefix);
+}
+
+/**
+ * xml_util_lookup_namespace:
+ * @doc: #xmlDoc
+ * @ns: namespace to look up (except DIDL-Lite, which doesn't have a prefix)
+ * @returns: %NULL if namespace does not exist, a pointer to the namespace
+ * otherwise.
+ */
+xmlNsPtr
+xml_util_lookup_namespace (xmlDocPtr doc, GUPnPXMLNamespace ns)
+{
+        xmlNsPtr *ns_list, *it, retval = NULL;
+        const char *ns_prefix = NULL;
+        const char *ns_uri = NULL;
+
+        g_return_val_if_fail (ns < GUPNP_XML_NAMESPACE_COUNT, NULL);
+
+        ns_prefix = gupnp_xml_namespaces[ns].prefix;
+        ns_uri = gupnp_xml_namespaces[ns].uri;
+
+        ns_list = xmlGetNsList (doc, xmlDocGetRootElement (doc));
+        if (ns_list == NULL)
+                return NULL;
+
+        for (it = ns_list; *it != NULL; it++) {
+                const char *it_prefix = (const char *) (*it)->prefix;
+                const char *it_uri = (const char *) (*it)->href;
+
+                if (it_prefix == NULL) {
+                        if (ns_prefix != NULL)
+                                continue;
+
+                        if (g_ascii_strcasecmp (it_uri, ns_uri) == 0) {
+                                retval = *it;
+                                break;
+                        }
+
+                        continue;
+                }
+
+                if (g_ascii_strcasecmp (it_prefix, ns_prefix) == 0) {
+                        retval = *it;
+                        break;
+                }
+        }
+
+        xmlFree (ns_list);
+
+        return retval;
+}
+
+/**
+ * xml_util_get_ns:
+ * @doc: A #xmlDoc.
+ * @ns: A #GUPnPXMLNamespace.
+ * @ns_out: (out) (allow-none): return location for the namespace or %NULL.
+ *
+ * Lazy-create a XML namespace on @doc.
+ *
+ * If @ns_out is non-%NULL, the function will return @ns_out immediately.
+ * @returns: either the existing #xmlNsPtr or a newly created one.
+ */
+xmlNsPtr
+xml_util_get_ns (xmlDocPtr doc, GUPnPXMLNamespace ns, xmlNsPtr *ns_out)
+{
+        xmlNsPtr tmp_ns;
+
+        /* User supplied namespace, just return that */
+        if (ns_out != NULL && *ns_out != NULL)
+                return *ns_out;
+
+        tmp_ns = xml_util_lookup_namespace (doc, ns);
+        if (!tmp_ns)
+                tmp_ns = xml_util_create_namespace (xmlDocGetRootElement (doc),
+                                                    ns);
+
+        if (ns_out != NULL)
+                *ns_out = tmp_ns;
+
+        return tmp_ns;
 }
