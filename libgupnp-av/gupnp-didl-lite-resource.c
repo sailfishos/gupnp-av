@@ -867,8 +867,6 @@ gupnp_didl_lite_resource_new_from_xml (xmlNode     *xml_node,
                              "dlna-namespace", dlna_ns,
                              "pv-namespace", pv_ns,
                              NULL);
-
-        return resource;
 }
 
 /**
@@ -1462,10 +1460,15 @@ gupnp_didl_lite_resource_set_cleartext_size
         else {
                 char *str;
                 str = g_strdup_printf ("%" G_GINT64_FORMAT, cleartext_size);
+                xml_util_get_ns (resource->priv->xml_doc->doc,
+                                 GUPNP_XML_NAMESPACE_DLNA,
+                                 &(resource->priv->dlna_ns));
+
                 xmlSetNsProp (resource->priv->xml_node,
                               resource->priv->dlna_ns,
                               (unsigned char *) "cleartextSize",
                               (unsigned char *) str);
+
                 g_free (str);
         }
 
@@ -1802,6 +1805,10 @@ gupnp_didl_lite_resource_set_track_total (GUPnPDIDLLiteResource *resource,
 
         g_return_if_fail (GUPNP_IS_DIDL_LITE_RESOURCE (resource));
 
+        xml_util_get_ns (resource->priv->xml_doc->doc,
+                         GUPNP_XML_NAMESPACE_DLNA,
+                         &(resource->priv->dlna_ns));
+
         str = g_strdup_printf ("%u", track_total);
         xmlSetNsProp (resource->priv->xml_node,
                       resource->priv->dlna_ns,
@@ -1909,11 +1916,15 @@ gupnp_didl_lite_resource_set_subtitle_file_uri
                 xmlUnsetNsProp (resource->priv->xml_node,
                                 resource->priv->pv_ns,
                                 (unsigned char *) "subtitleFileUri");
-        else
+        else {
+                xml_util_get_ns (resource->priv->xml_doc->doc,
+                                 GUPNP_XML_NAMESPACE_PV,
+                                 &(resource->priv->pv_ns));
                 xmlSetNsProp (resource->priv->xml_node,
                               resource->priv->pv_ns,
                               (unsigned char *) "subtitleFileUri",
                               uri);
+        }
 
         g_object_notify (G_OBJECT (resource), "subtitle-file-uri");
 }
@@ -1941,11 +1952,16 @@ gupnp_didl_lite_resource_set_subtitle_file_type
                 xmlUnsetNsProp (resource->priv->xml_node,
                                 resource->priv->pv_ns,
                                 (unsigned char *) "subtitleFileUri");
-        else
+        else {
+                xml_util_get_ns (resource->priv->xml_doc->doc,
+                                 GUPNP_XML_NAMESPACE_PV,
+                                 &(resource->priv->pv_ns));
+
                 xmlSetNsProp (resource->priv->xml_node,
                               resource->priv->pv_ns,
                               (unsigned char *) "subtitleFileType",
                               type);
+        }
 
         g_object_notify (G_OBJECT (resource), "subtitle-file-type");
 }

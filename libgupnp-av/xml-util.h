@@ -30,6 +30,16 @@
 #include <libxml/tree.h>
 #include <stdarg.h>
 
+typedef enum _GUPnPXMLNamespace
+{
+        GUPNP_XML_NAMESPACE_DIDL_LITE,
+        GUPNP_XML_NAMESPACE_DC,
+        GUPNP_XML_NAMESPACE_DLNA,
+        GUPNP_XML_NAMESPACE_PV,
+        GUPNP_XML_NAMESPACE_UPNP,
+        GUPNP_XML_NAMESPACE_COUNT
+} GUPnPXMLNamespace;
+
 G_BEGIN_DECLS
 
 /* Misc utilities for inspecting xmlNodes */
@@ -84,11 +94,12 @@ xml_util_get_int64_attribute            (xmlNode    *node,
                                          gint64      default_value);
 
 G_GNUC_INTERNAL xmlNode *
-xml_util_set_child                      (xmlNode    *parent_node,
-                                         xmlNs      *namespace,
-                                         xmlDoc     *doc,
-                                         const char *name,
-                                         const char *value);
+xml_util_set_child                      (xmlNode          *parent_node,
+                                         GUPnPXMLNamespace ns,
+                                         xmlNsPtr         *namespace,
+                                         xmlDoc           *doc,
+                                         const char       *name,
+                                         const char       *value);
 
 G_GNUC_INTERNAL void
 xml_util_unset_child                    (xmlNode    *parent_node,
@@ -116,6 +127,19 @@ xml_util_copy_node                      (xmlNode *node);
 
 G_GNUC_INTERNAL GHashTable *
 xml_util_get_attributes_map             (xmlNode *node);
+
+G_GNUC_INTERNAL xmlNsPtr
+xml_util_create_namespace               (xmlNodePtr root,
+                                         GUPnPXMLNamespace ns);
+
+G_GNUC_INTERNAL xmlNsPtr
+xml_util_lookup_namespace               (xmlDocPtr doc,
+                                         GUPnPXMLNamespace ns);
+
+G_GNUC_INTERNAL xmlNsPtr
+xml_util_get_ns                         (xmlDocPtr doc,
+                                         GUPnPXMLNamespace ns,
+                                         xmlNsPtr *ns_out);
 
 G_END_DECLS
 
