@@ -1,6 +1,6 @@
 AC_PREREQ([2.63])
 AC_INIT([gupnp-av],
-        [0.12.7],
+        [0.12.10],
         [https://bugzilla.gnome.org/enter_bug.cgi?product=GUPnP],
         [gupnp-av],
         [http://www.gupnp.org/])
@@ -15,18 +15,24 @@ AM_MAINTAINER_MODE([enable])
 
 AM_SILENT_RULES([yes])
 
+AX_REQUIRE_DEFINED([GTK_DOC_CHECK])
+AX_REQUIRE_DEFINED([GOBJECT_INTROSPECTION_CHECK])
+AX_CHECK_ENABLE_DEBUG([yes])
+
 # Check for programs
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_HEADER_STDC
 AC_FUNC_MMAP
 
+AX_IS_RELEASE([git-directory])
+AX_COMPILER_FLAGS([WARN_CFLAGS])
+
 # Initialize libtool
 LT_PREREQ([2.2])
 LT_INIT([win32-dll])
 
-PKG_CHECK_MODULES(LIBGUPNP, gupnp-1.0 >= 0.19.0 \
-                            gobject-2.0 \
+PKG_CHECK_MODULES(LIBGUPNP, gobject-2.0 >= 2.34 \
                             libxml-2.0)
 
 # glib-genmarshal
@@ -53,7 +59,7 @@ AS_IF([test "x$found_introspection" = "xyes"],
        AS_IF([pkg-config --atleast-version=1.36.0 gobject-introspection-1.0],
              [
               AC_MSG_RESULT([yes])
-              VAPIGEN_MIN_VERSION=0.20
+              VAPIGEN_MIN_VERSION=0.22
              ],[AC_MSG_RESULT([no])]
        )
        GUPNP_PROG_VAPIGEN([$VAPIGEN_MIN_VERSION])

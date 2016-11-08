@@ -32,7 +32,6 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <libgupnp/gupnp.h>
 #include "gupnp-protocol-info.h"
 #include "gupnp-av-error.h"
 
@@ -603,7 +602,7 @@ gupnp_protocol_info_class_init (GUPnPProtocolInfoClass *klass)
  * Return value: A new #GUPnPProtocolInfo object. Unref after usage.
  **/
 GUPnPProtocolInfo *
-gupnp_protocol_info_new ()
+gupnp_protocol_info_new (void)
 {
         return g_object_new (GUPNP_TYPE_PROTOCOL_INFO,
                              NULL);
@@ -839,8 +838,6 @@ gupnp_protocol_info_get_dlna_flags (GUPnPProtocolInfo *info)
  * @protocol: The protocol string
  *
  * Set the protocol of this info.
- *
- * Return value: None.
  **/
 void
 gupnp_protocol_info_set_protocol (GUPnPProtocolInfo *info,
@@ -861,8 +858,6 @@ gupnp_protocol_info_set_protocol (GUPnPProtocolInfo *info,
  * @network: The network string
  *
  * Set the network this info is associated with.
- *
- * Return value: None.
  **/
 void
 gupnp_protocol_info_set_network (GUPnPProtocolInfo *info,
@@ -883,8 +878,6 @@ gupnp_protocol_info_set_network (GUPnPProtocolInfo *info,
  * @mime_type: The MIME-type string
  *
  * Set the MIME-type of this info.
- *
- * Return value: None.
  **/
 void
 gupnp_protocol_info_set_mime_type (GUPnPProtocolInfo *info,
@@ -905,8 +898,6 @@ gupnp_protocol_info_set_mime_type (GUPnPProtocolInfo *info,
  * @profile: The DLNA profile string
  *
  * Set the DLNA profile of this info.
- *
- * Return value: None.
  **/
 void
 gupnp_protocol_info_set_dlna_profile (GUPnPProtocolInfo *info,
@@ -927,8 +918,6 @@ gupnp_protocol_info_set_dlna_profile (GUPnPProtocolInfo *info,
  * @speeds: The allowed play speeds
  *
  * Set the allowed play speeds on this info in the form of array of strings.
- *
- * Return value: None.
  **/
 void
 gupnp_protocol_info_set_play_speeds (GUPnPProtocolInfo *info,
@@ -949,8 +938,6 @@ gupnp_protocol_info_set_play_speeds (GUPnPProtocolInfo *info,
  * @conversion: The bitwise OR of one or more DLNA conversion flags
  *
  * Set the DLNA conversion flags.
- *
- * Return value: None.
  **/
 void
 gupnp_protocol_info_set_dlna_conversion (GUPnPProtocolInfo  *info,
@@ -969,8 +956,6 @@ gupnp_protocol_info_set_dlna_conversion (GUPnPProtocolInfo  *info,
  * @operation: The bitwise OR of one or more DLNA operation flags
  *
  * Set the DLNA operation flags.
- *
- * Return value: None.
  **/
 void
 gupnp_protocol_info_set_dlna_operation (GUPnPProtocolInfo *info,
@@ -989,8 +974,6 @@ gupnp_protocol_info_set_dlna_operation (GUPnPProtocolInfo *info,
  * @flags: The bitwise OR of one or more generic DLNA flags
  *
  * Set the gereric DLNA flags.
- *
- * Return value: None.
  **/
 void
 gupnp_protocol_info_set_dlna_flags (GUPnPProtocolInfo  *info,

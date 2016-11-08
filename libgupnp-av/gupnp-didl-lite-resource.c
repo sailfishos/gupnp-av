@@ -45,7 +45,7 @@ G_DEFINE_TYPE (GUPnPDIDLLiteResource,
 
 struct _GUPnPDIDLLiteResourcePrivate {
         xmlNode     *xml_node;
-        GUPnPXMLDoc *xml_doc;
+        GUPnPAVXMLDoc *xml_doc;
         xmlNs       *dlna_ns;
         xmlNs       *pv_ns;
 
@@ -148,7 +148,7 @@ gupnp_didl_lite_resource_set_property (GObject      *object,
                 resource->priv->xml_node = g_value_get_pointer (value);
                 break;
         case PROP_XML_DOC:
-                resource->priv->xml_doc = g_value_dup_object (value);
+                resource->priv->xml_doc = g_value_dup_boxed (value);
                 break;
         case PROP_URI:
                 gupnp_didl_lite_resource_set_uri (resource,
@@ -386,10 +386,7 @@ gupnp_didl_lite_resource_dispose (GObject *object)
 
         priv = GUPNP_DIDL_LITE_RESOURCE (object)->priv;
 
-        if (priv->xml_doc) {
-                g_object_unref (priv->xml_doc);
-                priv->xml_doc = NULL;
-        }
+        g_clear_pointer (&priv->xml_doc, xml_doc_unref);
 
         if (priv->protocol_info != NULL) {
                 g_object_unref (priv->protocol_info);
@@ -443,11 +440,11 @@ gupnp_didl_lite_resource_class_init (GUPnPDIDLLiteResourceClass *klass)
         g_object_class_install_property
                 (object_class,
                  PROP_XML_DOC,
-                 g_param_spec_object ("xml-doc",
+                 g_param_spec_boxed ("xml-doc",
                                       "XMLDoc",
                                       "The reference to XML document"
                                       " containing this object.",
-                                      GUPNP_TYPE_XML_DOC,
+                                      xml_doc_get_type (),
                                       G_PARAM_WRITABLE |
                                       G_PARAM_CONSTRUCT_ONLY |
                                       G_PARAM_STATIC_NAME |
@@ -854,13 +851,11 @@ gupnp_didl_lite_resource_class_init (GUPnPDIDLLiteResourceClass *klass)
  * Return value: A new #GUPnPDIDLLiteResource object. Unref after usage.
  **/
 GUPnPDIDLLiteResource *
-gupnp_didl_lite_resource_new_from_xml (xmlNode     *xml_node,
-                                       GUPnPXMLDoc *xml_doc,
-                                       xmlNs       *dlna_ns,
-                                       xmlNs       *pv_ns)
+gupnp_didl_lite_resource_new_from_xml (xmlNode       *xml_node,
+                                       GUPnPAVXMLDoc *xml_doc,
+                                       xmlNs         *dlna_ns,
+                                       xmlNs         *pv_ns)
 {
-        GUPnPDIDLLiteResource *resource;
-
         return g_object_new (GUPNP_TYPE_DIDL_LITE_RESOURCE,
                              "xml-node", xml_node,
                              "xml-doc", xml_doc,
@@ -980,7 +975,8 @@ gupnp_didl_lite_resource_get_protocol_info (GUPnPDIDLLiteResource *resource)
         protocol_info = xml_util_get_attribute_content
                                         (resource->priv->xml_node,
                                          "protocolInfo");
-        g_return_val_if_fail (protocol_info != NULL, NULL);
+        if (protocol_info == NULL)
+                return NULL;
 
         error = NULL;
         info = gupnp_protocol_info_new_from_string (protocol_info, &error);
@@ -1300,8 +1296,6 @@ gupnp_didl_lite_resource_track_total_is_set (GUPnPDIDLLiteResource *resource)
  * @uri: The URI as string
  *
  * Set the URI associated with the @resource.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_uri (GUPnPDIDLLiteResource *resource,
@@ -1326,8 +1320,6 @@ gupnp_didl_lite_resource_set_uri (GUPnPDIDLLiteResource *resource,
  * @import_uri: The URI as string
  *
  * Set the import URI associated with the @resource.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_import_uri (GUPnPDIDLLiteResource *resource,
@@ -1348,8 +1340,6 @@ gupnp_didl_lite_resource_set_import_uri (GUPnPDIDLLiteResource *resource,
  * @info: The protocol string
  *
  * Set the protocol info associated with the @resource.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_protocol_info (GUPnPDIDLLiteResource *resource,
@@ -1393,8 +1383,6 @@ gupnp_didl_lite_resource_set_protocol_info (GUPnPDIDLLiteResource *resource,
  *
  * Set the size (in bytes) of the @resource. Passing a negative number will
  * unset this property.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_size (GUPnPDIDLLiteResource *resource,
@@ -1410,8 +1398,6 @@ gupnp_didl_lite_resource_set_size (GUPnPDIDLLiteResource *resource,
  *
  * Set the size (in bytes) of the @resource. Passing a negative number will
  * unset this property.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_size64 (GUPnPDIDLLiteResource *resource,
@@ -1443,8 +1429,6 @@ gupnp_didl_lite_resource_set_size64 (GUPnPDIDLLiteResource *resource,
  *
  * Set the size (in bytes) of the @resource. Passing a negative number will
  * unset this property.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_cleartext_size
@@ -1482,8 +1466,6 @@ gupnp_didl_lite_resource_set_cleartext_size
  *
  * Set the duration (in seconds) of the @resource. Passing a negative number
  * will unset this property.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_duration (GUPnPDIDLLiteResource *resource,
@@ -1514,8 +1496,6 @@ gupnp_didl_lite_resource_set_duration (GUPnPDIDLLiteResource *resource,
  *
  * Set the bitrate (in bytes per second) of the @resource. Passing a negative
  * number will unset this property.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_bitrate (GUPnPDIDLLiteResource *resource,
@@ -1546,8 +1526,6 @@ gupnp_didl_lite_resource_set_bitrate (GUPnPDIDLLiteResource *resource,
  *
  * Set the sample frequency of the @resource. Passing a negative number will
  * unset this property.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_sample_freq (GUPnPDIDLLiteResource *resource,
@@ -1578,8 +1556,6 @@ gupnp_didl_lite_resource_set_sample_freq (GUPnPDIDLLiteResource *resource,
  *
  * Set the sample size of the @resource. Passing a negative number will unset
  * this property.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_bits_per_sample
@@ -1611,8 +1587,6 @@ gupnp_didl_lite_resource_set_bits_per_sample
  *
  * Set the protection system used by the @resource. Passing a negative number
  * will unset this property.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_protection (GUPnPDIDLLiteResource *resource,
@@ -1634,8 +1608,6 @@ gupnp_didl_lite_resource_set_protection (GUPnPDIDLLiteResource *resource,
  *
  * Set the number of audio channels in the @resource. Passing a negative number
  * will unset this property.
- *
- * Return value: The number of audio channels in the @resource or -1.
  **/
 void
 gupnp_didl_lite_resource_set_audio_channels (GUPnPDIDLLiteResource *resource,
@@ -1666,8 +1638,6 @@ gupnp_didl_lite_resource_set_audio_channels (GUPnPDIDLLiteResource *resource,
  *
  * Set the width of this image/video resource. Setting both width and height to
  * a negative number will unset the resolution property.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_width (GUPnPDIDLLiteResource *resource,
@@ -1701,8 +1671,6 @@ gupnp_didl_lite_resource_set_width (GUPnPDIDLLiteResource *resource,
  *
  * Set the height of this image/video resource. Setting both width and height to
  * a negative number will unset the resolution property.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_height (GUPnPDIDLLiteResource *resource,
@@ -1737,8 +1705,6 @@ gupnp_didl_lite_resource_set_height (GUPnPDIDLLiteResource *resource,
  *
  * Set the color-depth of this image/video resource. Passing a negative number
  * will unset this property.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_color_depth (GUPnPDIDLLiteResource *resource,
@@ -1768,8 +1734,6 @@ gupnp_didl_lite_resource_set_color_depth (GUPnPDIDLLiteResource *resource,
  * @update_count: The update_count
  *
  * Set the update count of this resource.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_update_count (GUPnPDIDLLiteResource *resource,
@@ -1794,8 +1758,6 @@ gupnp_didl_lite_resource_set_update_count (GUPnPDIDLLiteResource *resource,
  * @track_total: The total number of tracks in this resource
  *
  * Set the total number of tracks in this resource.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_set_track_total (GUPnPDIDLLiteResource *resource,
@@ -1825,8 +1787,6 @@ gupnp_didl_lite_resource_set_track_total (GUPnPDIDLLiteResource *resource,
  * @resource: A #GUPnPDIDLLiteResource
  *
  * Unset the update count of this resource.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_unset_update_count (GUPnPDIDLLiteResource *resource)
@@ -1844,8 +1804,6 @@ gupnp_didl_lite_resource_unset_update_count (GUPnPDIDLLiteResource *resource)
  * @resource: A #GUPnPDIDLLiteResource
  *
  * Unset the total track count of this resource.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_resource_unset_track_total (GUPnPDIDLLiteResource *resource)
@@ -1923,7 +1881,7 @@ gupnp_didl_lite_resource_set_subtitle_file_uri
                 xmlSetNsProp (resource->priv->xml_node,
                               resource->priv->pv_ns,
                               (unsigned char *) "subtitleFileUri",
-                              uri);
+                              (unsigned char *) uri);
         }
 
         g_object_notify (G_OBJECT (resource), "subtitle-file-uri");
@@ -1960,7 +1918,7 @@ gupnp_didl_lite_resource_set_subtitle_file_type
                 xmlSetNsProp (resource->priv->xml_node,
                               resource->priv->pv_ns,
                               (unsigned char *) "subtitleFileType",
-                              type);
+                              (unsigned char *) type);
         }
 
         g_object_notify (G_OBJECT (resource), "subtitle-file-type");

@@ -1,3 +1,64 @@
+0.12.10
+=======
+
+Changes since 0.12.9:
+
+- Remove unneeded dependency on GSSDP-1.0.gir
+
+
+All contributors to this release:
+ - Jens Georg <mail@jensge.org>
+
+0.12.9
+======
+
+Changes since 0.12.8:
+
+- Drop dependency on GUPnP
+
+All contributors to this release:
+ - Jens Georg <mail@jensge.org>
+
+0.12.8
+======
+
+Changes since 0.12.7:
+
+- Remove gnome-common.
+- Use -Wno-unused-parameter
+- Make DIDL-Lite check less restrictive
+- Distribute VAPI file
+
+Bugs fixed in this release:
+ - https://bugzilla.gnome.org/show_bug.cgi?id=740266
+ - https://bugzilla.gnome.org/show_bug.cgi?id=751102
+ - https://bugzilla.gnome.org/show_bug.cgi?id=753382
+
+All contributors to this release:
+ - Jens Georg <mail@jensge.org>
+ - Ting-Wei Lan <lantw@src.gnome.org>
+
+0.12.7
+======
+
+Changes since 0.12.6:
+
+- Remove use of deprecated INCLUDES.
+- Fix GUPnPDIDLLiteObject namespace getters.
+- Avoid warnings on missing protocol info.
+- Require vapigen 0.22 to avoid endless loop on VAPI generation.
+
+Bugs fixed in this release:
+ - https://bugzilla.gnome.org/show_bug.cgi?id=740265
+ - https://bugzilla.gnome.org/show_bug.cgi?id=741103
+ - https://bugzilla.gnome.org/show_bug.cgi?id=741555
+ - https://bugzilla.gnome.org/show_bug.cgi?id=740365
+
+All contributors to this release:
+ - Sven Neumann <neumann@teufel.de>
+ - Jens Georg <mail@jensge.org>
+ - Philip Withnall <philip.withnall@collabora.co.uk>
+
 0.12.6
 ======
 

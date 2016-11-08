@@ -26,7 +26,6 @@
 #include <stdarg.h>
 #include <glib-object.h>
 #include <libxml/tree.h>
-#include <libgupnp/gupnp.h>
 
 G_BEGIN_DECLS
 
@@ -71,6 +70,9 @@ typedef struct {
         void (* _gupnp_reserved3) (void);
         void (* _gupnp_reserved4) (void);
 } GUPnPDIDLLiteDescriptorClass;
+
+GUPnPDIDLLiteDescriptor *
+gupnp_didl_lite_descriptor_new (void);
 
 xmlNode *
 gupnp_didl_lite_descriptor_get_xml_node (GUPnPDIDLLiteDescriptor *descriptor);
