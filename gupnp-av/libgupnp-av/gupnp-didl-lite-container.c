@@ -464,7 +464,7 @@ gupnp_didl_lite_container_get_create_classes_full (
         for (l = cc_list; l; l = l->next) {
                 GUPnPDIDLLiteCreateClass *cc;
                 xmlNode *cc_node;
-                GUPnPXMLDoc *cc_doc;
+                GUPnPAVXMLDoc *cc_doc;
 
                 cc_node = (xmlNode *) l->data;
                 if (!cc_node->children)
@@ -633,7 +633,7 @@ gupnp_didl_lite_container_set_container_update_id
 {
         xmlNode *xml_node;
         xmlNsPtr upnp_ns;
-        GUPnPXMLDoc *xml_doc;
+        GUPnPAVXMLDoc *xml_doc;
         char *str;
         GUPnPDIDLLiteObject *self_as_object;
 
@@ -693,7 +693,7 @@ gupnp_didl_lite_container_set_total_deleted_child_count
 {
         xmlNode *xml_node;
         xmlNsPtr upnp_ns;
-        GUPnPXMLDoc *xml_doc;
+        GUPnPAVXMLDoc *xml_doc;
         char *str;
         GUPnPDIDLLiteObject *self_as_object;
 
@@ -745,8 +745,6 @@ gupnp_didl_lite_container_unset_total_deleted_child_count
  * @create_class: The createClass to add.
  *
  * Add a new create class to the @container. includeDerived defaults to "0".
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_container_add_create_class (
@@ -766,8 +764,6 @@ gupnp_didl_lite_container_add_create_class (
  * this container or not.
  *
  * Add a new create class to the @container.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_container_add_create_class_full (
@@ -807,8 +803,6 @@ gupnp_didl_lite_container_add_create_class_full (
  * @search_class: The searchClass to add.
  *
  * Add a new search class to the @container.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_container_add_search_class (
@@ -827,8 +821,6 @@ gupnp_didl_lite_container_add_search_class (
  * @include_derived: includeDerived attribute of the DIDL
  *
  * Add a new search class to the @container.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_container_add_search_class_full (

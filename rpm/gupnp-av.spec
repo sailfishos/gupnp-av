@@ -1,5 +1,5 @@
 Name:          gupnp-av
-Version:       0.12.5
+Version:       0.12.10
 Release:       1%{?dist}
 Summary:       A collection of helpers for building UPnP AV applications
 
@@ -10,7 +10,6 @@ Source0:       http://download.gnome.org/sources/gupnp-av/0.12/%{name}-%{version
 
 BuildRequires: glib2-devel
 BuildRequires: gssdp-devel >= 0.14.0
-BuildRequires: gupnp-devel >= 0.20.0
 BuildRequires: libxml2-devel
 BuildRequires: libsoup-devel
 BuildRequires: gobject-introspection-devel >= 1.36.0

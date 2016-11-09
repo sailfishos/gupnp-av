@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include "gupnp-didl-lite-descriptor.h"
+#include "gupnp-didl-lite-descriptor-private.h"
 #include "xml-util.h"
 
 G_DEFINE_TYPE (GUPnPDIDLLiteDescriptor,
@@ -37,8 +38,8 @@ G_DEFINE_TYPE (GUPnPDIDLLiteDescriptor,
                G_TYPE_OBJECT);
 
 struct _GUPnPDIDLLiteDescriptorPrivate {
-        xmlNode     *xml_node;
-        GUPnPXMLDoc *xml_doc;
+        xmlNode       *xml_node;
+        GUPnPAVXMLDoc *xml_doc;
 };
 
 enum {
@@ -76,7 +77,7 @@ gupnp_didl_lite_descriptor_set_property (GObject      *object,
                 descriptor->priv->xml_node = g_value_get_pointer (value);
                 break;
         case PROP_XML_DOC:
-                descriptor->priv->xml_doc = g_value_dup_object (value);
+                descriptor->priv->xml_doc = g_value_dup_boxed (value);
                 break;
         case PROP_ID:
                 gupnp_didl_lite_descriptor_set_id
@@ -156,10 +157,7 @@ gupnp_didl_lite_descriptor_dispose (GObject *object)
 
         priv = GUPNP_DIDL_LITE_DESCRIPTOR (object)->priv;
 
-        if (priv->xml_doc) {
-                g_object_unref (priv->xml_doc);
-                priv->xml_doc = NULL;
-        }
+        g_clear_pointer (&priv->xml_doc, xml_doc_unref);
 
         object_class = G_OBJECT_CLASS (gupnp_didl_lite_descriptor_parent_class);
         object_class->dispose (object);
@@ -209,11 +207,11 @@ gupnp_didl_lite_descriptor_class_init (GUPnPDIDLLiteDescriptorClass *klass)
         g_object_class_install_property
                 (object_class,
                  PROP_XML_DOC,
-                 g_param_spec_object ("xml-doc",
+                 g_param_spec_boxed ("xml-doc",
                                       "XMLDoc",
                                       "The reference to XML document"
                                       " containing this object.",
-                                      GUPNP_TYPE_XML_DOC,
+                                      xml_doc_get_type (),
                                       G_PARAM_WRITABLE |
                                       G_PARAM_CONSTRUCT_ONLY |
                                       G_PARAM_STATIC_NAME |
@@ -312,11 +310,9 @@ gupnp_didl_lite_descriptor_new (void)
  * Return value: A new #GUPnPDIDLLiteDescriptor object. Unref after usage.
  **/
 GUPnPDIDLLiteDescriptor *
-gupnp_didl_lite_descriptor_new_from_xml (xmlNode     *xml_node,
-                                         GUPnPXMLDoc *xml_doc)
+gupnp_didl_lite_descriptor_new_from_xml (xmlNode       *xml_node,
+                                         GUPnPAVXMLDoc *xml_doc)
 {
-        GUPnPDIDLLiteDescriptor *descriptor;
-
         return g_object_new (GUPNP_TYPE_DIDL_LITE_DESCRIPTOR,
                              "xml-node", xml_node,
                              "xml-doc", xml_doc,
@@ -413,8 +409,6 @@ gupnp_didl_lite_descriptor_get_name_space (GUPnPDIDLLiteDescriptor *descriptor)
  * @content: The content as string
  *
  * Set the content of the @descriptor.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_descriptor_set_content (GUPnPDIDLLiteDescriptor *descriptor,
@@ -439,8 +433,6 @@ gupnp_didl_lite_descriptor_set_content (GUPnPDIDLLiteDescriptor *descriptor,
  * @id: The ID as string
  *
  * Set the ID of the @descriptor.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_descriptor_set_id (GUPnPDIDLLiteDescriptor *descriptor,
@@ -462,8 +454,6 @@ gupnp_didl_lite_descriptor_set_id (GUPnPDIDLLiteDescriptor *descriptor,
  * @type: The metadata type as string
  *
  * Set the metadata type of the @descriptor.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_descriptor_set_metadata_type
@@ -486,8 +476,6 @@ gupnp_didl_lite_descriptor_set_metadata_type
  * @name_space: The name space URI as string
  *
  * Set the name space associated with the @descriptor.
- *
- * Return value: None.
  **/
 void
 gupnp_didl_lite_descriptor_set_name_space (GUPnPDIDLLiteDescriptor *descriptor,
