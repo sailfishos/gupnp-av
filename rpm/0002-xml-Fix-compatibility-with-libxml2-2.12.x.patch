@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jens Georg <mail@jensge.org>
+Date: Sat, 25 Nov 2023 17:58:49 +0100
+Subject: [PATCH] xml: Fix compatibility with libxml2 2.12.x
+
+---
+ libgupnp-av/xml-util.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libgupnp-av/xml-util.h b/libgupnp-av/xml-util.h
+index e0e49f7adeef75cd71f8fc4eb2b13fb47dc18ba3..0bbe0f8cedfe2655a7864e6f9412c189b2f8bb13 100644
+--- a/libgupnp-av/xml-util.h
++++ b/libgupnp-av/xml-util.h
+@@ -16,6 +16,7 @@
+ 
+ #include <glib.h>
+ #include <libxml/tree.h>
++#include <libxml/parser.h>
+ #include <stdarg.h>
+ #include <glib-object.h>
+ 
